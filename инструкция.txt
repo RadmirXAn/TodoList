@@ -1,0 +1,26 @@
+#Комментарий
+
+---
+
+Установка Expo CLI
+	npm install --global expo-cli
+ 
+Инициализация проекта
+
+	#Создать пустой проект с поддержкой TypeScript
+	expo init Tasks
+	cd Tasks
+	
+	#Установить Redux
+	npm install @types/react-redux  #npm install react-redux
+	
+	#Установить Paper UI
+	npm install react-native-paper
+	
+	#Установить Class-transformer
+	npm install class-transformer --save
+	npm install reflect-metadata --save
+	
+Запуск сервера разработки
+	expo start
+	
