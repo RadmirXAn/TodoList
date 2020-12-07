@@ -81,6 +81,27 @@ class Main extends Component<null,MainStates>{
         });
     }
 
+    createList(){
+        ajaxList.createList((value:string)=>{
+            console.log( "ajaxList.createList()" );
+            this.getList();
+        });
+    }
+
+    renameList(id:number, name:string){
+        ajaxList.editList(id,{title:name},(value:string)=>{
+            console.log( "ajaxList.editList()" );
+            this.getList();
+        });
+    }
+
+    removeList(id:number){
+        ajaxList.removeList(id,(value:string)=>{
+            console.log( "ajaxList.removeList()" );
+            this.getList();
+        });
+    }
+
     createTodo(listId: number){
         ajaxList.createTodo(listId,(value:string)=>{
             console.log( "ajaxList.createTodo()" );
@@ -88,9 +109,16 @@ class Main extends Component<null,MainStates>{
         });
     }
 
-    createList(){
-        ajaxList.createList((value:string)=>{
-            console.log( "ajaxList.createList()" );
+    renameTodo(listId: number, todoId: number, name:string){
+        ajaxList.editTodo(listId, todoId, {text:name}, (value:string)=>{
+            console.log( "ajaxList.editTodo()" );
+            this.getList();
+        });
+    }
+
+    removeTodo(listId: number, todoId: number){
+        ajaxList.removeTodo(listId, todoId,(value:string)=>{
+            console.log( "ajaxList.removeTodo()" );
             this.getList();
         });
     }
