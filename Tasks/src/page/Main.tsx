@@ -7,7 +7,7 @@ import { createStore } from 'redux'
 import todoList from './list/List';
 import ajaxList from './ajax/List';
 
-import { Button, FAB, List, Modal } from 'react-native-paper';
+import { Button, FAB, List, Modal, TextInput } from 'react-native-paper';
 
 import Logotype from './element/Logotype';
 import Figures from './element/Figures';
@@ -38,6 +38,7 @@ type MainStates = {
     showCheked: ShowChecked,
     selectedListIndex:number,
     showModal:boolean,
+    newListTitle:string,
 }
 
 class Main extends Component<null,MainStates>{
@@ -50,6 +51,7 @@ class Main extends Component<null,MainStates>{
             showCheked: {},
             selectedListIndex: -1,
             showModal: false,
+            newListTitle: "",
         }
 
         store.subscribe(this.updateState);
@@ -83,8 +85,8 @@ class Main extends Component<null,MainStates>{
         });
     }
 
-    createList(){
-        ajaxList.createList({title:"Новый список"},(value:string)=>{
+    createList(name:string){
+        ajaxList.createList({title:name},(value:string)=>{
             console.log( "ajaxList.createList()" );
             this.getList();
         });
@@ -237,10 +239,18 @@ class Main extends Component<null,MainStates>{
 
                 <IF condition={this.state.showModal}>
                     <Modal visible={true} onDismiss={()=> this.setState({showModal:false}) }  contentContainerStyle={styles.modal}>
-                        <ScrollView>
+                        <ScrollView >
                             {modalList}
                         </ScrollView>
-                        <List.Item style={styles.item}  title="Новая категория" onPress={() => this.createList() } right={() => <List.Icon color="gray" icon="plus" />} />
+                        <TextInput
+                            label="Новая категория"
+                            value={this.state.newListTitle}
+                            onChangeText={text => this.setState({newListTitle:text}) }
+                            style={{justifyContent: "center", backgroundColor:"white", paddingLeft:4}}
+                            right={
+                                <TextInput.Icon name="plus" style={{marginRight:29}}  onPress={() => {this.createList(this.state.newListTitle); this.setState({newListTitle:""}); } }/>
+                            }
+                        />
                     </Modal>
                 </IF>
 
