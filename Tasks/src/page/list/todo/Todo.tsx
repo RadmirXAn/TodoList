@@ -9,7 +9,7 @@ class Todo{
     }
 
     set text(value:string){
-        this._text = value || "unnamed";
+        this._text = value || "Безымянная задача";
     }
 
     list_id:number = 0;

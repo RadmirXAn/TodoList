@@ -1,22 +1,19 @@
 import React from "react";
 
-import { StyleSheet, SafeAreaView, View } from 'react-native';
+import { StyleSheet, SafeAreaView, View, StatusBar } from 'react-native';
 
-import Frame_1 from './src/page/Frame_1'
-import Frame_2 from './src/page/Frame_2'
-import Frame_3 from './src/page/Frame_3'
-import Test from './src/page/Test'
-import RequestTest from './src/page/RequestTest'
+import Main from './src/page/Main'
 
 export default function App() {
   return (
-    
+    <>
+    <StatusBar backgroundColor="black" barStyle="default" />
     <SafeAreaView  style={styles.container}>
       <View style={styles.container}>
-        <RequestTest />
+        <Main />
       </View>
     </SafeAreaView>
-
+    </>
   );
 }
 

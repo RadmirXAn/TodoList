@@ -32,17 +32,6 @@ class List{
         xhttp.send();
     }
 
-    static removeList(id:number, callback:Function){
-        var xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function() {
-          if (this.readyState == 4 && this.status == 200) {
-            callback(this.responseText);
-          }
-        };
-        xhttp.open("DELETE", List.link+"list/"+id, true);
-        xhttp.send();
-    }
-
     static editList(id:number, data:object, callback:Function){
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
@@ -54,6 +43,17 @@ class List{
         };
         console.log( List.link+"list/"+id+this.linkData(data) );
         xhttp.open("PATCH", List.link+"list/"+id+this.linkData(data), true);
+        xhttp.send();
+    }
+
+    static removeList(id:number, callback:Function){
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200) {
+            callback(this.responseText);
+          }
+        };
+        xhttp.open("DELETE", List.link+"list/"+id, true);
         xhttp.send();
     }
 

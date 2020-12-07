@@ -18,11 +18,6 @@ function reducer(state:List[], action:Action):List[] {
     switch (action.type) {
         case 'init':
             return List.getLists(action.value);
-        case 'add':
-            return state;
-        case 'remove':
-            state.pop()
-            return state;
         default:
             return state
     }

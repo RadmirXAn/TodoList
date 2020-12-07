@@ -11,7 +11,7 @@ class List{
     }
 
     set title(value:string){
-        this._title = value || "unnamed";
+        this._title = value || "Безымянный список";
     }
 
     candidate_id:number = 0;
