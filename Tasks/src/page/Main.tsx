@@ -2,17 +2,16 @@ import React, { Component } from 'react';
 
 import { View, StyleSheet, ScrollView } from 'react-native';
 
-import { Text } from 'react-native-paper';
-
 import { createStore } from 'redux'
 
 import todoList from './list/List';
 import ajaxList from './ajax/List';
 
-import { Title, Button, FAB, List } from 'react-native-paper';
+import { Button, FAB, List } from 'react-native-paper';
 
-import Logotype from './element/Logotype'
-import Figures from './element/Figures'
+import Logotype from './element/Logotype';
+import Figures from './element/Figures';
+import IF from './element/IF';;
 
 type Action = {
     type:string,
@@ -35,8 +34,9 @@ interface ShowChecked {
  } 
 
 type MainStates = {
-    texts: todoList[],
-    showCheked: ShowChecked
+    lists: todoList[],
+    showCheked: ShowChecked,
+    selectedListIndex:number
 }
 
 class Main extends Component<null,MainStates>{
@@ -45,8 +45,9 @@ class Main extends Component<null,MainStates>{
         super(props);
     
         this.state = {
-            texts: [],
-            showCheked: {}
+            lists: [],
+            showCheked: {},
+            selectedListIndex: -1
         }
 
         store.subscribe(this.updateState);
@@ -55,7 +56,7 @@ class Main extends Component<null,MainStates>{
     }
 
     updateState = () => {
-        this.setState({texts: store.getState()});        
+        this.setState({lists: store.getState()});        
     }
 
     getList(){
@@ -80,9 +81,21 @@ class Main extends Component<null,MainStates>{
         });
     }
 
-    render() {
+    createTodo(listId: number){
+        ajaxList.createTodo(listId,(value:string)=>{
+            console.log( "ajaxList.createTodo()" );
+            this.getList();
+        });
+    }
 
-        console.log('Rendered')
+    createList(){
+        ajaxList.createList((value:string)=>{
+            console.log( "ajaxList.createList()" );
+            this.getList();
+        });
+    }
+
+    render() {
 
         var list = [];
 
@@ -99,7 +112,10 @@ class Main extends Component<null,MainStates>{
                         key={"item_"+i+"_"+j}
                         title={state[i].getTodo(j).text}
                         left={() => <List.Icon color={checked ? "#1879FE" : "black" } icon = { checked ? "check" : "circle-outline"} />}
-                        onPress={()=>this.todoCheck(i,j)}
+                        onPress={ ()=> {
+                            this.todoCheck(i,j); this.setState({selectedListIndex:i});
+                            }
+                        }
                     />;
                 if(checked){
                     todoChecked.push(item);
@@ -125,7 +141,7 @@ class Main extends Component<null,MainStates>{
                         ()=> { 
                             var data = this.state.showCheked;
                             data[listId] = data[listId]==true ? false: true;
-                            this.setState({showCheked: data});
+                            this.setState({showCheked: data, selectedListIndex:i});
                         }
                     }
                 />
@@ -133,7 +149,11 @@ class Main extends Component<null,MainStates>{
 
             list.push(
                 <List.Section  key={"section_"+i}>
-                    <List.Subheader  key={"subheader_"+i} style={{textTransform: 'uppercase'}}>{state[i].title}</List.Subheader>
+                    <List.Subheader
+                        key={"subheader_"+i}
+                        style={this.state.selectedListIndex==i ? styles.selectedList : styles.unselectedList}
+                        onPress={()=>this.setState({selectedListIndex:i})}
+                    >{state[i].title}</List.Subheader>
                     {todoUnChecked}
                     {todoChecked}
                 </List.Section>
@@ -151,12 +171,16 @@ class Main extends Component<null,MainStates>{
 
                 <View style={styles.bar}>
                     <View style={{position:"relative", left:48, top:3}}><Figures/></View>
-                    <Button mode="text" style={{width:0}} onPress={() => console.log('Pressed')} color="black"><></></Button>
+                    <Button mode="text" style={{width:0}} onPress={() => this.createList() } color="black"><></></Button>
                 </View>
 
                 <ScrollView>
                     {list}
                 </ScrollView>
+
+                <IF condition={this.state.lists[this.state.selectedListIndex]!=null}>
+                    <FAB style={styles.fab} small icon="plus" color="white" onPress={() => this.createTodo(this.state.lists[this.state.selectedListIndex].id) } />
+                </IF>
 
             </View>                
         );
@@ -167,7 +191,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         flexDirection: 'column',
-        justifyContent: "flex-end"
+        justifyContent: 'flex-end'
     },
     item:{
         height:50,
@@ -179,9 +203,27 @@ const styles = StyleSheet.create({
         top: -5
     },
     logo:{
-        alignItems:"flex-end",
+        alignItems:'flex-end',
         marginRight: 7
     },
+    selectedList:{
+        textTransform: 'uppercase',
+        backgroundColor: 'gray',
+        color: 'white'
+    },
+    unselectedList:{
+        textTransform: 'uppercase',
+        backgroundColor: 'white',
+        color: 'black'
+    },
+    fab: {
+      position: 'absolute',
+      padding: 7,
+      margin: 14,
+      right: 0,
+      bottom: 0,
+      backgroundColor: '#1879FE',
+    }
   })
 
 export default Main;
