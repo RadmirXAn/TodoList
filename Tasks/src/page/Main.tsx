@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView, Dimensions } from 'react-native';
 
 import { createStore } from 'redux'
 
 import todoList from './list/List';
 import ajaxList from './ajax/List';
 
-import { Button, FAB, List } from 'react-native-paper';
+import { Button, FAB, List, Modal } from 'react-native-paper';
 
 import Logotype from './element/Logotype';
 import Figures from './element/Figures';
@@ -36,18 +36,20 @@ interface ShowChecked {
 type MainStates = {
     lists: todoList[],
     showCheked: ShowChecked,
-    selectedListIndex:number
+    selectedListIndex:number,
+    showModal:boolean,
 }
 
 class Main extends Component<null,MainStates>{
 
     constructor(props:any) {
         super(props);
-    
+
         this.state = {
             lists: [],
             showCheked: {},
-            selectedListIndex: -1
+            selectedListIndex: -1,
+            showModal: false,
         }
 
         store.subscribe(this.updateState);
@@ -126,6 +128,7 @@ class Main extends Component<null,MainStates>{
     render() {
 
         var list = [];
+        var modalList = [];
 
         const state = store.getState()
 
@@ -186,6 +189,20 @@ class Main extends Component<null,MainStates>{
                     {todoChecked}
                 </List.Section>
             )
+
+            modalList.push(
+                <List.Item
+                    key={"modalItem_"+i}
+                    style={styles.item} 
+                    title={state[i].title}
+                    right={() => <List.Icon color="red" icon="trash-can-outline" />}
+                    onPress={
+                        ()=>{
+                            this.removeList(listId);
+                        }
+                    }
+                />
+            );
         }
 
         return (
@@ -195,19 +212,36 @@ class Main extends Component<null,MainStates>{
                     <Logotype/>
                 </View>
 
-                <List.Item style={{height:20}} titleStyle={{fontSize:20}} title="Задачи" left={() => <List.Icon icon="circle-outline" color="white" />} />
+                <List.Section>
+                    <List.Item style={{height:20}} titleStyle={{fontSize:20}} title="Задачи" left={() => <List.Icon icon="circle-outline" color="white" />} />
+                </List.Section>
 
-                <View style={styles.bar}>
-                    <View style={{position:"relative", left:48, top:3}}><Figures/></View>
-                    <Button mode="text" style={{width:0}} onPress={() => this.createList() } color="black"><></></Button>
-                </View>
+                
+                    <View style={styles.bar}>
+                        <IF condition={!this.state.showModal}>
+                            <View style={{position:"relative", left:48, top:3}}><Figures/></View>
+                        </IF>
+                        <Button mode="text" style={{width:0}} onPress={() => this.setState({showModal:true}) } color="black"><></></Button>
+                    </View>
+                
 
                 <ScrollView>
                     {list}
                 </ScrollView>
 
                 <IF condition={this.state.lists[this.state.selectedListIndex]!=null}>
-                    <FAB style={styles.fab} small icon="plus" color="white" onPress={() => this.createTodo(this.state.lists[this.state.selectedListIndex].id) } />
+                    <IF condition={!this.state.showModal}>
+                        <FAB style={styles.fab} small icon="plus" color="white" onPress={() => this.createTodo(this.state.lists[this.state.selectedListIndex].id) } />
+                    </IF>
+                </IF>
+
+                <IF condition={this.state.showModal}>
+                    <Modal visible={true} onDismiss={()=> this.setState({showModal:false}) }  contentContainerStyle={styles.modal}>
+                        <ScrollView>
+                            {modalList}
+                        </ScrollView>
+                        <List.Item style={styles.item}  title="Новая категория" onPress={() => this.createList() } right={() => <List.Icon color="gray" icon="plus" />} />
+                    </Modal>
                 </IF>
 
             </View>                
@@ -223,7 +257,7 @@ const styles = StyleSheet.create({
     },
     item:{
         height:50,
-        justifyContent: 'center'
+        justifyContent: 'center',
     },
     bar:{
         flexDirection: 'row',
@@ -251,6 +285,15 @@ const styles = StyleSheet.create({
       right: 0,
       bottom: 0,
       backgroundColor: '#1879FE',
+    },
+    modal:{
+        position: 'absolute',
+        bottom:0,
+        height:250,
+        width: Dimensions.get('window').width,
+        backgroundColor: 'white',
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
     }
   })
 
