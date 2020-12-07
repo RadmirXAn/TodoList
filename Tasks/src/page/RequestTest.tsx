@@ -50,7 +50,7 @@ class RequestTest extends Component{
     }
 
     createList(){
-        ajaxList.createList((value:string)=>{
+        ajaxList.createList({title:"Новый список"},(value:string)=>{
             console.log( "ajaxList.createList()" );
             this.getList();
         });
@@ -83,7 +83,7 @@ class RequestTest extends Component{
 
         if(state.length==0)return;
 
-        ajaxList.createTodo(state[state.length-1].id,(value:string)=>{
+        ajaxList.createTodo(state[state.length-1].id, {text:"Новая задача"},(value:string)=>{
             console.log( "ajaxList.createTodo()" );
             this.getList();
         });

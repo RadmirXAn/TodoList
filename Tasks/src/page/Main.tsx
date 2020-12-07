@@ -84,7 +84,7 @@ class Main extends Component<null,MainStates>{
     }
 
     createList(){
-        ajaxList.createList((value:string)=>{
+        ajaxList.createList({title:"Новый список"},(value:string)=>{
             console.log( "ajaxList.createList()" );
             this.getList();
         });
@@ -105,7 +105,7 @@ class Main extends Component<null,MainStates>{
     }
 
     createTodo(listId: number){
-        ajaxList.createTodo(listId,(value:string)=>{
+        ajaxList.createTodo(listId, {text:"Новая задача"},(value:string)=>{
             console.log( "ajaxList.createTodo()" );
             this.getList();
         });

@@ -2,7 +2,7 @@ import React from "react";
 
 import { StyleSheet, SafeAreaView, View, StatusBar } from 'react-native';
 
-import Main from './src/page/Main'
+import Main from './src/page/Main';
 
 export default function App() {
   return (

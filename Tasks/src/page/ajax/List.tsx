@@ -21,14 +21,14 @@ class List{
         xhttp.send();
     }
 
-    static createList(callback:Function){
+    static createList(data:object, callback:Function){
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
           if (this.readyState == 4 && this.status == 200) {
             callback(this.responseText);
           }
         };
-        xhttp.open("POST", List.link+"list", true);
+        xhttp.open("POST", List.link+"list"+this.linkData(data), true);
         xhttp.send();
     }
 
@@ -57,14 +57,14 @@ class List{
         xhttp.send();
     }
 
-    static createTodo(listId:number, callback:Function){
+    static createTodo(listId:number, data:object, callback:Function){
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
           if (this.readyState == 4 && this.status == 200) {
             callback(this.responseText);
           }
         };
-        xhttp.open("POST", List.link+"list/"+listId+"/todo", true);
+        xhttp.open("POST", List.link+"list/"+listId+"/todo"+this.linkData(data), true);
         xhttp.send();
     }   
 
