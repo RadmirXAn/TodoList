@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Tasks",
-    "slug": "Tasks",
+    "slug": "todolist",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -27,6 +27,8 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "description": "Реализация тестового задания\nhttps://www.oblakogroup.ru/assignment/mobile-developer",
+    "githubUrl": "https://github.com/RadmirXAn/TodoList"
   }
 }
