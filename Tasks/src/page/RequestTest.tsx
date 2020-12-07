@@ -7,21 +7,19 @@ import { createStore } from 'redux'
 
 import List from './list/List';
 
-let jsonText:string = '[{"id":4,"title":"Семья","candidate_id":2,"created_at":"2020-07-10T13:05:07.801Z","updated_at":"2020-07-10T13:05:07.801Z","todos":[{"id":9,"text":"Купить молоко","list_id":4,"checked":false,"created_at":"2020-07-10T13:05:07.822Z","updated_at":"2020-07-10T13:05:07.822Z"},{"id":10,"text":"Постирать вещи","list_id":4,"checked":false,"created_at":"2020-07-10T13:05:07.826Z","updated_at":"2020-07-10T13:05:07.826Z"},{"id":11,"text":"Убрать комнату","list_id":4,"checked":true,"created_at":"2020-07-10T13:05:07.828Z","updated_at":"2020-07-10T13:05:07.828Z"}]},{"id":5,"title":"Работа","candidate_id":2,"created_at":"2020-07-10T13:05:07.832Z","updated_at":"2020-07-10T13:05:07.832Z","todos":[{"id":12,"text":"Заполнить отчет","list_id":5,"checked":false,"created_at":"2020-07-10T13:05:07.836Z","updated_at":"2020-07-10T13:05:07.836Z"},{"id":13,"text":"Отправить документы","list_id":5,"checked":false,"created_at":"2020-07-10T13:05:07.838Z","updated_at":"2020-07-10T13:05:07.838Z"},{"id":14,"text":"Позвонить заказчику","list_id":5,"checked":true,"created_at":"2020-07-10T13:05:07.841Z","updated_at":"2020-07-10T13:05:07.841Z"}]},{"id":6,"title":"Прочее","candidate_id":2,"created_at":"2020-07-10T13:05:07.843Z","updated_at":"2020-07-10T13:05:07.843Z","todos":[{"id":15,"text":"Позвонить к другу","list_id":6,"checked":false,"created_at":"2020-07-10T13:05:07.847Z","updated_at":"2020-07-10T13:05:07.847Z"},{"id":16,"text":"Подготовиться к поездке","list_id":6,"checked":false,"created_at":"2020-07-10T13:05:07.849Z","updated_at":"2020-07-10T13:05:07.849Z"}]},{"id":7,"title":null,"candidate_id":2,"created_at":"2020-07-12T14:08:44.220Z","updated_at":"2020-07-12T14:08:44.220Z","todos":[]}]';
-
-let lists:List[] = List.getLists(jsonText);
-
-console.log( lists.length, lists[0].getTodoCount(), lists[0].getTodo(0) );
+import ajaxList from './ajax/List';
 
 type Action = {
-    type:String,
-    value:String
+    type:string,
+    value:string
 }
 
-function reducer(state:String[], action:Action):String[] {
+function reducer(state:List[], action:Action):List[] {
     switch (action.type) {
+        case 'init':
+            return List.getLists(action.value);
         case 'add':
-            return state.concat(action.value);
+            return state;
         case 'remove':
             state.pop()
             return state;
@@ -41,21 +39,89 @@ class RequestTest extends Component{
             texts: []
         }
 
-        store.subscribe(this.update)
+        store.subscribe(this.updateState);
+
     }
 
-    update = () => {
+    updateState = () => {
         this.setState({texts: store.getState()});        
     }
 
-    add(){
-        console.log('Add')
-        store.dispatch({ type: 'add', value: 'Test_'+(Math.random()*5) })
+    getList(){
+        ajaxList.getLists((value:string)=>{
+            console.log( "ajaxList.getLists()" );
+            store.dispatch({ type: 'init', value: value })
+        });
     }
 
-    remove(){
-        console.log('Remove')
-        store.dispatch( { type: 'remove', value:"" } )
+    createList(){
+        ajaxList.createList((value:string)=>{
+            console.log( "ajaxList.createList()" );
+            this.getList();
+        });
+    }
+
+    removeList(){
+        const state = store.getState();
+
+        if(state.length==0)return;
+
+        ajaxList.removeList(state[state.length-1].id,(value:string)=>{
+            console.log( "ajaxList.removeList()" );
+            this.getList();
+        });
+    }
+
+    renameList(){
+        const state = store.getState();
+
+        if(state.length==0)return;
+
+        ajaxList.editList(state[state.length-1].id,{title:"New List Name"},(value:string)=>{
+            console.log( "ajaxList.editList()" );
+            this.getList();
+        });
+    }
+
+    createTodo(){
+        const state = store.getState();
+
+        if(state.length==0)return;
+
+        ajaxList.createTodo(state[state.length-1].id,(value:string)=>{
+            console.log( "ajaxList.createTodo()" );
+            this.getList();
+        });
+    }
+
+    renameTodo(){
+        const state = store.getState();
+
+        if(state.length==0)return;
+
+        let list = state[state.length-1];
+        let listId = list.id;
+        let todoId = list.getTodo( list.getTodoCount() - 1 ).id;
+
+        ajaxList.editTodo(listId, todoId, {text:"New Todo Name"}, (value:string)=>{
+            console.log( "ajaxList.editTodo()" );
+            this.getList();
+        });
+    }
+
+    removeTodo(){
+        const state = store.getState();
+
+        if(state.length==0)return;
+
+        let list = state[state.length-1];
+        let listId = list.id;
+        let todoId = list.getTodo( list.getTodoCount() - 1 ).id;
+
+        ajaxList.removeTodo(listId, todoId,(value:string)=>{
+            console.log( "ajaxList.removeTodo()" );
+            this.getList();
+        });
     }
 
     facke(){
@@ -73,16 +139,26 @@ class RequestTest extends Component{
 
         for(var i = 0; i<state.length; i++){
             texts.push(
-                <Text key={"key_"+i}>{state[i]}</Text>
+                <Text key={"key_"+i}>{state[i].title}</Text>
             );
+            for(var j=0; j < state[i].getTodoCount(); j++){
+                texts.push(
+                    <Text key={"key_"+i+"_"+j}>    {state[i].getTodo(j).text}</Text>
+                );
+            }
         }
 
         return (
             <View style={styles.container}>
                 {texts}
                 <Text>{state.length}</Text>
-                <Button onPress={() =>this.add()}>Add</Button>
-                <Button onPress={() =>this.remove()}>Remove</Button>
+                <Button onPress={() =>this.getList()}>Update</Button>
+                <Button onPress={() =>this.createList()}>Create List</Button>
+                <Button onPress={() =>this.renameList()}>Rename List</Button>                
+                <Button onPress={() =>this.removeList()}>Remove List</Button>
+                <Button onPress={() =>this.createTodo()}>Crate Todo</Button>
+                <Button onPress={() =>this.renameTodo()}>Rename Todo</Button>
+                <Button onPress={() =>this.removeTodo()}>Remove Todo</Button>
                 <Button onPress={() =>this.facke()}>Facke</Button>
             </View>                
         );

@@ -1,7 +1,17 @@
 
 class Todo{
     id:number = 0;
-    text:string = "";
+
+    _text:string = "";
+
+    get text():string{
+        return this._text;
+    }
+
+    set text(value:string){
+        this._text = value || "unnamed";
+    }
+
     list_id:number = 0;
     checked:boolean = false;
 }

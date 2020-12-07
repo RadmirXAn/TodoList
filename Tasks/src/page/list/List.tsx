@@ -4,7 +4,16 @@ import Todo from './todo/Todo';
 
 class List{
     id:number = 0;
-    title:string = "";
+    _title:string = "";
+
+    get title():string{
+        return this._title;
+    }
+
+    set title(value:string){
+        this._title = value || "unnamed";
+    }
+
     candidate_id:number = 0;
 
     _todos:Todo[] = [];
